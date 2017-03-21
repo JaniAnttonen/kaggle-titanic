@@ -4,11 +4,6 @@ from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D
 from keras.utils import np_utils
 from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import cross_val_score
-# from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import StratifiedKFold
-# from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 
 class TitanicClassifier(object):
   def __init__(self):
