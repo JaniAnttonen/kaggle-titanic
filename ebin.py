@@ -1,5 +1,6 @@
 import numpy
 import pandas
+import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense, Conv1D, MaxPooling1D
 from keras.utils import np_utils
@@ -15,24 +16,37 @@ class TitanicClassifier(object):
     self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
   def load_train_data(self):
-    survived = pandas.read_csv("data/train.csv", header=None, usecols=[1])
-    trainData = pandas.read_csv("data/train.csv", header=None, usecols=[2,4,5,6,9])
-    sexlabels = {'male': 1, 'female': 2}
+    self.all_train_data = pandas.read_csv("data/train.csv", usecols=[1,2,4,5,6,9])
+
+    # Replace sex labels with mapped values
+    self.all_train_data = self.all_train_data.replace(to_replace='male', value=1)
+    self.all_train_data = self.all_train_data.replace(to_replace='female', value=2)
+
+    # Drop any missing data
+    self.all_train_data = self.all_train_data.dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)
+
+    # Load subdata for neural network
+    survived = pandas.read_csv("data/train.csv", usecols=[1])
+    trainData = pandas.read_csv("data/train.csv", usecols=[2,4,5,6,9])
     trainData = trainData.replace(to_replace='male', value=1)
     trainData = trainData.replace(to_replace='female', value=2)
 
-    self.trainData = trainData.values[1:]
-    self.dataLabels = survived.values[1:]
-
-    print self.trainData, self.dataLabels
+    self.trainData = trainData
+    self.dataLabels = survived
 
   def train(self):
-    self.model.fit(self.trainData, self.dataLabels, nb_epoch=22, batch_size=10)
+    self.model.fit(self.trainData.values[1:], self.dataLabels.values[1:], nb_epoch=22, batch_size=10)
+
+  def descriptive_statistics(self):
+    print self.all_train_data.groupby('Survived').describe()
+    self.all_train_data.groupby('Survived').hist()
+    plt.show()
 
 def main(argv=None):
   classifier = TitanicClassifier()
   classifier.load_train_data()
-  classifier.train()
+  # classifier.train()
+  classifier.descriptive_statistics()
 
   # load test data
   testData = pandas.read_csv("data/test.csv", header=None, usecols=[1,3,4,5,8])
@@ -43,9 +57,9 @@ def main(argv=None):
   testData = testData.values[1:6]
 
   # Predict the scores
-  results = classifier.model.predict(testData)
+  # results = classifier.model.predict(testData)
 
-  print results
+  #print results
 
 if __name__ == '__main__':
   main()
