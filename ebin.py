@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.utils import np_utils
+from keras import optimizers
 
 
 class TitanicClassifier(object):
@@ -21,12 +22,16 @@ class TitanicClassifier(object):
         # Construct the computational graph
         self.model = Sequential()
         self.model.add(
-            Dense(32, input_dim=5, init='normal', activation='relu'))
+            Dense(25, input_dim=5, init='normal', activation='relu'))
+        self.model.add(
+            Dense(120, input_dim=5, init='normal', activation='relu'))
         self.model.add(Dense(2, init='normal', activation='softmax'))
+
+        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
         # Compile the neural network model
         self.model.compile(loss='categorical_crossentropy',
-                           optimizer='rmsprop',
+                           optimizer='adam',
                            metrics=['accuracy'])
 
     def load_train_data(self):
@@ -70,7 +75,7 @@ class TitanicClassifier(object):
         Fits the model to the train data
         """
         self.model.fit(self.train_data, self.train_labels,
-                       nb_epoch=50, batch_size=80, verbose=2)
+                       nb_epoch=2048, batch_size=20, verbose=2)
 
     def descriptive_statistics(self):
         """
