@@ -2,15 +2,15 @@ import numpy
 import pandas
 import matplotlib.pyplot as plt
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Dropout
+from keras.layers import Dense
 from keras.utils import np_utils
-from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.preprocessing import LabelEncoder
 
 
 class TitanicClassifier(object):
 
     def __init__(self):
+        self.all_train_data, self.trainData, self.dataLabels = {None, None, None}
+
         self.model = Sequential()
         self.model.add(
             Dense(32, input_dim=5, init='normal', activation='relu'))
@@ -21,6 +21,9 @@ class TitanicClassifier(object):
                            metrics=['accuracy'])
 
     def load_train_data(self):
+        """
+        Loads Titanic train data to memory from train.csv
+        """
         self.all_train_data = pandas.read_csv(
             "data/train.csv", usecols=[1, 2, 4, 5, 6, 9])
 
@@ -45,10 +48,16 @@ class TitanicClassifier(object):
         self.dataLabels = survived.astype(float)
 
     def train(self):
+        """
+        Fits the model to the train data
+        """
         self.model.fit(self.trainData, self.dataLabels,
                        nb_epoch=10, batch_size=80, verbose=2)
 
     def descriptive_statistics(self):
+        """
+        Prints out basic descriptives of the distribution
+        """
         print self.all_train_data.groupby('Survived').describe()
         self.all_train_data.groupby('Survived').hist()
         plt.show()
