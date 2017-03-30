@@ -14,13 +14,17 @@ class TitanicClassifier(object):
     """
 
     def __init__(self):
-        self.all_train_data, self.trainData, self.dataLabels = [None, None, None]
+        # Assignments to satisfy pylint lul
+        self.all_train_data, self.trainData, self.dataLabels = [
+            None, None, None]
 
+        # Construct the computational graph
         self.model = Sequential()
         self.model.add(
             Dense(32, input_dim=5, init='normal', activation='relu'))
         self.model.add(Dense(2, init='normal', activation='softmax'))
 
+        # Compile the neural network model
         self.model.compile(loss='categorical_crossentropy',
                            optimizer='rmsprop',
                            metrics=['accuracy'])
@@ -29,6 +33,7 @@ class TitanicClassifier(object):
         """
         Loads Titanic train data to memory from train.csv
         """
+        # Load the whole train data file
         self.all_train_data = pandas.read_csv(
             "data/train.csv", usecols=[1, 2, 4, 5, 6, 9])
 
@@ -42,22 +47,25 @@ class TitanicClassifier(object):
         self.all_train_data = self.all_train_data.replace(
             to_replace='female', value=2)
 
-        # Load subdata for neural network
-        survived = self.all_train_data.filter(items=['Survived']).values[1:]
-        survived = np_utils.to_categorical(survived)
-        trainData = self.all_train_data.filter(items=['Pclass', 'Sex', 'Age', 'SibSp', 'Fare'])
-        trainData = trainData.replace(to_replace='male', value=1)
-        trainData = trainData.replace(to_replace='female', value=2)
+        ###################################
+        # Load subdata for neural network #
+        ###################################
 
-        self.trainData = trainData.values[1:].astype(float)
-        self.dataLabels = survived.astype(int)
-        print self.trainData, self.dataLabels
+        # Split boolean for survived (true, false) as training labels
+        survived = self.all_train_data.filter(
+            items=['Survived']).values[1:].astype(int)
+        # Convert to categorical data (boolean values for both 0 and 1)
+        self.trainLabels = np_utils.to_categorical(survived)
+
+        # Load correlating data points as training data
+        self.trainData = self.all_train_data.filter(
+            items=['Pclass', 'Sex', 'Age', 'SibSp', 'Fare']).values[1:].astype(float)
 
     def train(self):
         """
         Fits the model to the train data
         """
-        self.model.fit(self.trainData, self.dataLabels,
+        self.model.fit(self.trainData, self.trainLabels,
                        nb_epoch=50, batch_size=80, verbose=2)
 
     def descriptive_statistics(self):
