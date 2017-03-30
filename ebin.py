@@ -15,8 +15,8 @@ class TitanicClassifier(object):
 
     def __init__(self):
         # Assignments to satisfy pylint lul
-        self.all_train_data, self.train_data, self.data_labels = [
-            None, None, None]
+        self.all_train_data, self.train_data, self.data_labels, self.test_data_size = [
+            None, None, None, None]
 
         # Construct the computational graph
         self.model = Sequential()
@@ -35,7 +35,7 @@ class TitanicClassifier(object):
         """
         # Load the whole train data file
         self.all_train_data = pandas.read_csv(
-            "data/train.csv", usecols=[1, 2, 4, 5, 6, 9])
+            "data/train.csv", usecols=[0, 1, 2, 4, 5, 6, 9])
 
         # Drop any missing data
         self.all_train_data = self.all_train_data.dropna(
