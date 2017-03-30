@@ -15,7 +15,7 @@ class TitanicClassifier(object):
 
     def __init__(self):
         # Assignments to satisfy pylint lul
-        self.all_train_data, self.trainData, self.dataLabels = [
+        self.all_train_data, self.train_data, self.data_labels = [
             None, None, None]
 
         # Construct the computational graph
@@ -47,6 +47,10 @@ class TitanicClassifier(object):
         self.all_train_data = self.all_train_data.replace(
             to_replace='female', value=2)
 
+        # Get remaining indeces
+        self.train_indeces = self.all_train_data.filter(
+            items=['PassengerId']).values[1:]
+
         ###################################
         # Load subdata for neural network #
         ###################################
@@ -55,17 +59,17 @@ class TitanicClassifier(object):
         survived = self.all_train_data.filter(
             items=['Survived']).values[1:].astype(int)
         # Convert to categorical data (boolean values for both 0 and 1)
-        self.trainLabels = np_utils.to_categorical(survived)
+        self.train_labels = np_utils.to_categorical(survived)
 
         # Load correlating data points as training data
-        self.trainData = self.all_train_data.filter(
+        self.train_data = self.all_train_data.filter(
             items=['Pclass', 'Sex', 'Age', 'SibSp', 'Fare']).values[1:].astype(float)
 
     def train(self):
         """
         Fits the model to the train data
         """
-        self.model.fit(self.trainData, self.trainLabels,
+        self.model.fit(self.train_data, self.train_labels,
                        nb_epoch=50, batch_size=80, verbose=2)
 
     def descriptive_statistics(self):
