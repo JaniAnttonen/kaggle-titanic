@@ -7,6 +7,11 @@ from keras.utils import np_utils
 
 
 class TitanicClassifier(object):
+    """
+    A Keras classifier / Pandas descriptives wrapper for
+    a Kaggle contest where the object is to predict if
+    a passenger in the test data survives the sinking or not
+    """
 
     def __init__(self):
         self.all_train_data, self.trainData, self.dataLabels = {None, None, None}
