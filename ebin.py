@@ -14,7 +14,7 @@ class TitanicClassifier(object):
     """
 
     def __init__(self):
-        self.all_train_data, self.trainData, self.dataLabels = {None, None, None}
+        self.all_train_data, self.trainData, self.dataLabels = [None, None, None]
 
         self.model = Sequential()
         self.model.add(
@@ -32,32 +32,33 @@ class TitanicClassifier(object):
         self.all_train_data = pandas.read_csv(
             "data/train.csv", usecols=[1, 2, 4, 5, 6, 9])
 
+        # Drop any missing data
+        self.all_train_data = self.all_train_data.dropna(
+            axis=0, how='any', thresh=None, subset=None, inplace=False)
+
         # Replace sex labels with mapped values
         self.all_train_data = self.all_train_data.replace(
             to_replace='male', value=1)
         self.all_train_data = self.all_train_data.replace(
             to_replace='female', value=2)
 
-        # Drop any missing data
-        self.all_train_data = self.all_train_data.dropna(
-            axis=0, how='any', thresh=None, subset=None, inplace=False)
-
         # Load subdata for neural network
-        survived = pandas.read_csv("data/train.csv", usecols=[1]).values[1:]
+        survived = self.all_train_data.filter(items=['Survived']).values[1:]
         survived = np_utils.to_categorical(survived)
-        trainData = pandas.read_csv("data/train.csv", usecols=[2, 4, 5, 6, 9])
+        trainData = self.all_train_data.filter(items=['Pclass', 'Sex', 'Age', 'SibSp', 'Fare'])
         trainData = trainData.replace(to_replace='male', value=1)
         trainData = trainData.replace(to_replace='female', value=2)
 
         self.trainData = trainData.values[1:].astype(float)
-        self.dataLabels = survived.astype(float)
+        self.dataLabels = survived.astype(int)
+        print self.trainData, self.dataLabels
 
     def train(self):
         """
         Fits the model to the train data
         """
         self.model.fit(self.trainData, self.dataLabels,
-                       nb_epoch=10, batch_size=80, verbose=2)
+                       nb_epoch=50, batch_size=80, verbose=2)
 
     def descriptive_statistics(self):
         """
